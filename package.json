@@ -1,0 +1,44 @@
+{
+  "name": "script-pattern-factory",
+  "version": "0.0.1",
+  "description": "Creates patterns from Javascript code",
+  "repository": "https://github.com/bgauryy/ScriptPatternFactory",
+  "author": {
+    "name": "Guy Bary",
+    "email": "bgauryy@gmail.com"
+  },
+  "keywords": [
+    "Javascript",
+    "AST",
+    "pattern"
+  ],
+  "engines": {
+    "node": ">=10.16.3"
+  },
+  "main": "src/index.cjs.js",
+  "module": "src/index.esm.js",
+  "scripts": {
+    "lint": "eslint src",
+    "build": "rollup -c",
+    "clean": "rimraf src/index.cjs.js src/index.esm.js",
+    "prepublishOnly": "yarn clean && yarn lint && yarn build"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint"
+    }
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1",
+    "husky": "^3.0.5",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.31.1",
+    "rollup-plugin-babel": "^4.3.3",
+    "@babel/preset-env": "^7.8.4"
+  },
+  "dependencies": {
+    "abstract-syntax-tree": "^2.5.0",
+    "uglify-js": "^3.8.0"
+  },
+  "license": "MIT"
+}
