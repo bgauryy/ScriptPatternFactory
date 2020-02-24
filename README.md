@@ -21,7 +21,7 @@ Traverse source code and returns its AST pattern
 returns the [AST nodes mapping](https://github.com/bgauryy/ScriptPatternFactory/blob/master/src/constants.js)
 
 ## AST Nodes Mapping
-```json
+```
  {
 	  Program: '',
 	  FunctionDeclaration: 'F',
