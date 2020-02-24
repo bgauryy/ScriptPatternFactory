@@ -33,7 +33,7 @@ function parseNodes(nodes, opts) {
     }
     let pattern = '';
     for (let i = 0; i < nodes.length; i++) {
-        pattern += getNodeSymbol(nodes[i]);
+        pattern += getNodeSymbol(nodes[i], opts.map);
     }
     if (opts.compressed) {
         return compressPattern(pattern);

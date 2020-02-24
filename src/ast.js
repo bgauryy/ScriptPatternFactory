@@ -31,13 +31,13 @@ function traversSourceCode(source, parse) {
     });
 }
 
-function getNodeSymbol(node) {
+function getNodeSymbol(node, customMap = {}) {
     const type = node.type;
     if (!type) {
         return '';
     }
     if (Object.prototype.hasOwnProperty.call(symbolMap, type)) {
-        return symbolMap[type];
+        return customMap[type] || symbolMap[type];
     }
     throw new Error(type);
 }
