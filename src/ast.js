@@ -3,27 +3,9 @@ const {symbolMap} = require('./constants');
 
 function traversSourceCode(source, parse) {
     const root = AST.parse(source, parse);
-    const sourceLines = source.split('\n');
+    const getSourceByLines = sourceGetter(source);
     const nodes = [];
     let stack = [root];
-
-    function getSrc({start, end}) {
-        // Retrieve the source of the node
-        let src = null;
-        try {
-            if (start.line < end.line) {
-                src = sourceLines[start.line - 1].substr(start.column);
-                for (let i = start.line; i < end.line; i++) {
-                    src += sourceLines[i] + '\n';
-                }
-            } else {
-                src = sourceLines[start.line - 1].substr(start.column, end.column - start.column);
-            }
-        } catch (e) {
-
-        }
-        return src;
-    }
 
     return new Promise(resolve => {
         (async function getDFS() {
@@ -32,7 +14,7 @@ function traversSourceCode(source, parse) {
                 return resolve(nodes);
             }
             if (node.src === undefined) {
-                node.src = getSrc(node.loc);
+                node.src = getSourceByLines(node.loc);
             }
             const {nodeChildren, attrs} = getChildrenArray(node);
             const children = [];
@@ -45,7 +27,7 @@ function traversSourceCode(source, parse) {
             if (nodeChildren) {
                 for (let i = 0; i < nodeChildren.length; i++) {
                     const nodeChild = nodeChildren[i];
-                    nodeChild.src = getSrc(nodeChild.loc);
+                    nodeChild.src = getSourceByLines(nodeChild.loc);
                     children.push(nodeChild);
                 }
             }
@@ -55,6 +37,32 @@ function traversSourceCode(source, parse) {
                 .then(getDFS);
         })();
     });
+}
+
+function sourceGetter(source) {
+    // Wrapper for getLinesFromSource to avoid splitting the same source repeatedly
+    const sourceSplitLines = source.split('\n');
+    return function (start, end) {
+        return getLinesFromSource(start, end, sourceSplitLines);
+    } 
+}
+
+function getLinesFromSource(start, end, sourceLines) {
+    // Retrieve the source of the node
+    let src = null;
+    try {
+        if (start.line < end.line) {
+            src = sourceLines[start.line - 1].substr(start.column);
+            for (let i = start.line; i < end.line; i++) {
+                src += sourceLines[i] + '\n';
+            }
+        } else {
+            src = sourceLines[start.line - 1].substr(start.column, end.column - start.column);
+        }
+    } catch (e) {
+
+    }
+    return src;
 }
 
 function getNodeSymbol(node, customMap = {}) {
@@ -83,7 +91,7 @@ function getChildrenArray(node) {
             }
         }}
     return {
-        nodeChildren:  [].concat.apply([], children.filter(obj => obj !== null)),
+        nodeChildren:  [].concat.apply([], children.filter(c => !!c)),
         attrs: attrs
     };
 }
