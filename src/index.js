@@ -11,7 +11,6 @@ const { traversSourceCode } = require('./ast')
 async function getPattern(source, opts = {}) {
     opts.input = opts.input || {};
     opts.parse = opts.parse || {};
-    opts.parse.loc = opts.parse.loc || true;
     opts.output = opts.output || {};
     return createPattern(source, opts);
 }
@@ -28,7 +27,11 @@ function inspect() {
     };
 }
 
-const getNodes = traversSourceCode;
+async function getNodes(source, parse = {}) {
+    parse.loc = parse.loc || true;
+    return traversSourceCode(source, parse);
+}
+
 
 module.exports = {
     getPattern,
