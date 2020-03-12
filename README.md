@@ -71,7 +71,7 @@ returns the [AST nodes mapping](https://github.com/bgauryy/ScriptPatternFactory/
 }
 ``` 
 
-## Example
+## Example - SPF.parse
 
  ````javascript
 const SPF = require('script-pattern-factory');
@@ -92,6 +92,29 @@ const SPF = require('script-pattern-factory');
     console.log(`Symbol Map:\n${JSON.stringify(SPF.inspect())}`);
 })();
 ````
+#### SPF.getNodes (source, opts)
+Traverse source code and returns its AST, complete with the code for each node. 
+- `source` (string)
+- `parse` (object) [meriyah parsing API](https://github.com/meriyah/meriyah#api). Note the location (`loc`) option is on by default and is required to extract the actual code for each node.
 
+## Example - SPF.getNodes
+ ````javascript
+const SPF = require('script-pattern-factory');
 
-
+(async function () {
+    const code = `
+    const x = 10;
+    function foo(val){
+        console.log(val);
+    }
+    foo(x);
+    ;
+    const y = 55;
+    `;
+    const nodes = await SPF.getNodes(code);
+    console.log(`Parsed ${nodes.length}:`);
+    for (let node of nodes) {
+        console.log(`[${node.type.padEnd(22)}] ==> ${node.src.replace('\n', '')}`);
+    }
+})();
+````
