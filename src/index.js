@@ -1,5 +1,6 @@
 const {symbolMap} = require('./constants');
 const {createPattern} = require('./pattern');
+const { traversSourceCode } = require('./ast')
 
 /**
  *
@@ -10,6 +11,7 @@ const {createPattern} = require('./pattern');
 async function getPattern(source, opts = {}) {
     opts.input = opts.input || {};
     opts.parse = opts.parse || {};
+    opts.parse.loc = opts.parse.loc || true;
     opts.output = opts.output || {};
     return createPattern(source, opts);
 }
@@ -26,7 +28,10 @@ function inspect() {
     };
 }
 
+const getNodes = traversSourceCode;
+
 module.exports = {
     getPattern,
-    inspect
+    inspect,
+    getNodes
 };

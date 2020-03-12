@@ -3,8 +3,27 @@ const {symbolMap} = require('./constants');
 
 function traversSourceCode(source, parse) {
     const root = AST.parse(source, parse);
+    const sourceLines = source.split('\n');
     const nodes = [];
     let stack = [root];
+
+    function getSrc({start, end}) {
+        // Retrieve the source of the node
+        let src = null;
+        try {
+            if (start.line < end.line) {
+                src = sourceLines[start.line - 1].substr(start.column);
+                for (let i = start.line; i < end.line; i++) {
+                    src += sourceLines[i] + '\n';
+                }
+            } else {
+                src = sourceLines[start.line - 1].substr(start.column, end.column - start.column);
+            }
+        } catch (e) {
+
+        }
+        return src;
+    }
 
     return new Promise(resolve => {
         (async function getDFS() {
@@ -12,15 +31,22 @@ function traversSourceCode(source, parse) {
             if (!node) {
                 return resolve(nodes);
             }
-            const {nodeChildren, prop} = getChildrenArray(node);
+            if (node.src === undefined) {
+                node.src = getSrc(node.loc);
+            }
+            const {nodeChildren, attrs} = getChildrenArray(node);
             const children = [];
             if (node.type !== 'Program') {
-                delete node[prop];
+                for (const attr of attrs) {
+                    delete node[attr];
+                }
                 nodes.push(node);
             }
             if (nodeChildren) {
                 for (let i = 0; i < nodeChildren.length; i++) {
-                    children.push(nodeChildren[i]);
+                    const nodeChild = nodeChildren[i];
+                    nodeChild.src = getSrc(nodeChild.loc);
+                    children.push(nodeChild);
                 }
             }
             stack = children.concat(stack);
@@ -43,53 +69,22 @@ function getNodeSymbol(node, customMap = {}) {
 }
 
 function getChildrenArray(node) {
-    let children = [];
-    let prop = '';
-
-    if (Array.isArray(node)) {
-        children = node;
-    } else if (node.body) {
-        children = Array.isArray(node.body) ? node.body : [node.body];
-        prop = 'body';
-    } else if (node.properties) {
-        children = node.properties;
-        prop = 'properties';
-    } else if (node.block) {
-        children = node.block.body;
-        prop = 'block';
-    } else if (node.expression) {
-        children = [node.expression];
-        prop = 'expression';
-    } else if (node.expressions) {
-        children = node.expressions;
-        prop = 'expressions';
-    } else if (node.argument) {
-        children = [node.argument];
-        prop = 'argument';
-    } else if (node.callee) {
-        children = [node.callee];
-        prop = 'callee';
-    } else if (node.declarations) {
-        children = node.declarations;
-        prop = 'declarations';
-    } else if (node.cases) {
-        children = node.cases;
-        prop = 'cases';
-    } else if (node.consequent) {
-        children = [node.consequent];
-        prop = 'consequent';
-    } else if (node.property) {
-        children = [node.property];
-        prop = 'property';
-    } else if (node.id) {
-        children = [node.id];
-        prop = 'id';
-    } else {
-        //TODO: impl
-    }
+    const children = [];
+    const attrs = [];
+    const ignoreAttrs = ['loc', 'src'];
+    const ignoreTypes = ['EmptyStatement', 'Literal', 'Identifier', 'ThisExpression',
+                         'ContinueStatement', 'BreakStatement'];
+    const acceptableType = ['object', 'array'];
+    if (!ignoreTypes.includes(node.type)) {
+        for (const prop of Object.keys(node)) {
+            if (acceptableType.includes(typeof node[prop]) && !ignoreAttrs.includes(prop)) {
+                attrs.push(prop);
+                children.push(node[prop]);
+            }
+        }}
     return {
-        nodeChildren: children,
-        prop
+        nodeChildren:  [].concat.apply([], children.filter(obj => obj !== null)),
+        attrs: attrs
     };
 }
 
