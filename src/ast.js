@@ -42,9 +42,9 @@ function traversSourceCode(source, parse) {
 function sourceGetter(source) {
     // Wrapper for getLinesFromSource to avoid splitting the same source repeatedly
     const sourceSplitLines = source.split('\n');
-    return function (start, end) {
+    return function ({start, end}) {
         return getLinesFromSource(start, end, sourceSplitLines);
-    } 
+    };
 }
 
 function getLinesFromSource(start, end, sourceLines) {
