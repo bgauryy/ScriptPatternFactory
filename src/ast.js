@@ -59,9 +59,7 @@ function getLinesFromSource(start, end, sourceLines) {
         } else {
             src = sourceLines[start.line - 1].substr(start.column, end.column - start.column);
         }
-    } catch (e) {
-
-    }
+    } catch (e) {}
     return src;
 }
 
