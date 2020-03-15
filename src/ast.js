@@ -3,7 +3,7 @@ const {symbolMap} = require('./constants');
 
 function traversSourceCode(source, parse) {
     const root = AST.parse(source, parse);
-    const getSourceByLines = sourceGetter(source);
+    const getLinesContent = sourceGetter(source);
     const nodes = [];
     let stack = [root];
 
@@ -14,7 +14,7 @@ function traversSourceCode(source, parse) {
                 return resolve(nodes);
             }
             if (node.src === undefined) {
-                node.src = getSourceByLines(node.loc);
+                node.src = node.loc ? getLinesContent(node.loc) : '';
             }
             const {nodeChildren, attrs} = getChildrenArray(node);
             const children = [];
@@ -27,7 +27,7 @@ function traversSourceCode(source, parse) {
             if (nodeChildren) {
                 for (let i = 0; i < nodeChildren.length; i++) {
                     const nodeChild = nodeChildren[i];
-                    nodeChild.src = getSourceByLines(nodeChild.loc);
+                    nodeChild.src = nodeChild.loc ? getLinesContent(nodeChild.loc) : '';
                     children.push(nodeChild);
                 }
             }
@@ -39,25 +39,36 @@ function traversSourceCode(source, parse) {
     });
 }
 
+/**
+ * Returns an instance of getCodeFromSourceLines for a specific source, saving the repeated line splits overhead.
+ * @param {string} source - The source code to extract lines from
+ */
 function sourceGetter(source) {
     // Wrapper for getLinesFromSource to avoid splitting the same source repeatedly
     const sourceSplitLines = source.split('\n');
     return function ({start, end}) {
-        return getLinesFromSource(start, end, sourceSplitLines);
+        return getCodeFromSourceLines(start, end, sourceSplitLines);
     };
 }
 
-function getLinesFromSource(start, end, sourceLines) {
+/**
+ * Returns the code between the start and end locations in the source.
+ * @param {Object} start - The starting line and column of the requested source
+ * @param {Object} end - The ending line and column of the requested source
+ * @param {Array} sourceLines - The source code split into lines
+ */
+function getCodeFromSourceLines(start, end, sourceLines) {
     // Retrieve the source of the node
     let src = null;
     try {
         if (start.line < end.line) {
-            src = sourceLines[start.line - 1].substr(start.column);
-            for (let i = start.line; i < end.line; i++) {
-                src += sourceLines[i] + '\n';
-            }
-        } else {
-            src = sourceLines[start.line - 1].substr(start.column, end.column - start.column);
+            const relevantLines = sourceLines.slice(start.line - 1, end.line);
+            if (start.column > 0) relevantLines[0] = relevantLines[0].slice(start.column);
+            const lastLine = relevantLines.length - 1;
+            if (end.column < relevantLines[lastLine].length) relevantLines[lastLine] = relevantLines[lastLine].slice(0, end.column);
+            src = relevantLines.join('\n');
+        } else if (start.line === end.line) {
+            src = sourceLines[start.line - 1].slice(start.column, end.column);
         }
     } catch (e) {}
     return src;
