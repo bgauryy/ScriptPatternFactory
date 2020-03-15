@@ -87,7 +87,7 @@ const SPF = require('script-pattern-factory');
     const y = 55;
     `;
     const pattern = await SPF.getPattern(code);
-    //VvIFBECNIECIVvI
+    //VveIFIBECNIIIIECIIVveI
     console.log(`Pattern ${pattern}`);
     console.log(`Symbol Map:\n${JSON.stringify(SPF.inspect())}`);
 })();
@@ -114,7 +114,7 @@ const SPF = require('script-pattern-factory');
     const nodes = await SPF.getNodes(code);
     console.log(`Parsed ${nodes.length}:`);
     for (let node of nodes) {
-        console.log(`[${node.type.padEnd(22)}] ==> ${node.src.replace('\n', '')}`);
+        console.log(`[${node.type.padEnd(19)}] ==> ${node.src.replace('\n', '')}`);
     }
 })();
 ````
