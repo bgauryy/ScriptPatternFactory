@@ -11,7 +11,7 @@ const {getPattern, inspect} = require('../src/index');
     var y = 55;
     `;
     const pattern = await getPattern(code);
-    console.log(`Pattern ${pattern}`); //VvIFBECNIECIVvI
+    console.log(`Pattern ${pattern}`); //VveIFIBECNIIIIECIIVveI
     console.log(`Symbol Map:\n${JSON.stringify(inspect())}`);
 })();
 
