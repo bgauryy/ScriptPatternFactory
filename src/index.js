@@ -1,6 +1,6 @@
 const {symbolMap} = require('./constants');
 const {createPattern} = require('./pattern');
-const { traversSourceCode } = require('./ast')
+const { traversSourceCode } = require('./ast');
 
 /**
  *
