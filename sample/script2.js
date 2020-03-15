@@ -13,6 +13,6 @@ const SPF = require('../src/index');
     const nodes = await SPF.getNodes(code);
     console.log(`Parsed ${nodes.length}:`);
     for (let node of nodes) {
-        console.log(`[${node.type.padEnd(22)}] ==> ${node.src.replace('\n', '')}`);
+        console.log(`[${node.type.padEnd(19)}] ==> ${node.src.replace('\n', '')}`);
     }
 })();
