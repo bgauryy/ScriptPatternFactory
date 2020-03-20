@@ -1,7 +1,13 @@
 const AST = require('abstract-syntax-tree');
 const {symbolMap} = require('./constants');
 
-function traversSourceCode(source, parse) {
+/**
+ * 
+ * @param {string} source - The source code to traverse
+ * @param {Object} parse - The parsing options for the AST parser
+ * @param {Object} opts - Additional traversal options
+ */
+function traversSourceCode(source, parse, opts) {
     const root = AST.parse(source, parse);
     const getLinesContent = sourceGetter(source);
     const nodes = [];
@@ -18,7 +24,7 @@ function traversSourceCode(source, parse) {
             }
             const {nodeChildren, attrs} = getChildrenArray(node);
             const children = [];
-            if (node.type !== 'Program') {
+            if (!opts.keepAttrs && node.type !== 'Program') {
                 for (const attr of attrs) {
                     delete node[attr];
                 }
