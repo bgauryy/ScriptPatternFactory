@@ -1,5 +1,5 @@
 const AST = require('abstract-syntax-tree');
-const {symbolMap} = require('./constants');
+const { symbolMap } = require('./constants');
 
 /**
  * 
@@ -22,11 +22,13 @@ function traversSourceCode(source, parse, opts) {
             if (node.src === undefined) {
                 node.src = node.loc ? getLinesContent(node.loc) : '';
             }
-            const {nodeChildren, attrs} = getChildrenArray(node);
+            const { nodeChildren, attrs } = getChildrenArray(node);
             const children = [];
-            if (!opts.keepAttrs && node.type !== 'Program') {
-                for (const attr of attrs) {
-                    delete node[attr];
+            if (node.type !== 'Program') {
+                if (!opts.keepAttrs) {
+                    for (const attr of attrs) {
+                        delete node[attr];
+                    }
                 }
                 nodes.push(node);
             }
@@ -52,7 +54,7 @@ function traversSourceCode(source, parse, opts) {
 function sourceGetter(source) {
     // Wrapper for getLinesFromSource to avoid splitting the same source repeatedly
     const sourceSplitLines = source.split('\n');
-    return function ({start, end}) {
+    return function ({ start, end }) {
         return getCodeFromSourceLines(start, end, sourceSplitLines);
     };
 }
@@ -76,7 +78,7 @@ function getCodeFromSourceLines(start, end, sourceLines) {
         } else if (start.line === end.line) {
             src = sourceLines[start.line - 1].slice(start.column, end.column);
         }
-    } catch (e) {}
+    } catch (e) { }
     return src;
 }
 
@@ -96,7 +98,7 @@ function getChildrenArray(node) {
     const attrs = [];
     const ignoreAttrs = ['loc', 'src'];
     const ignoreTypes = ['EmptyStatement', 'Literal', 'Identifier', 'ThisExpression',
-                         'ContinueStatement', 'BreakStatement'];
+        'ContinueStatement', 'BreakStatement'];
     const acceptableType = ['object', 'array'];
     if (!ignoreTypes.includes(node.type)) {
         for (const prop of Object.keys(node)) {
@@ -104,9 +106,10 @@ function getChildrenArray(node) {
                 attrs.push(prop);
                 children.push(node[prop]);
             }
-        }}
+        }
+    }
     return {
-        nodeChildren:  [].concat.apply([], children.filter(c => !!c)),
+        nodeChildren: [].concat.apply([], children.filter(c => !!c)),
         attrs: attrs
     };
 }
