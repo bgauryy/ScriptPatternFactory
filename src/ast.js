@@ -7,7 +7,7 @@ const { symbolMap } = require('./constants');
  * @param {Object} parse - The parsing options for the AST parser
  * @param {Object} opts - Additional traversal options
  */
-function traversSourceCode(source, parse, opts) {
+function traversSourceCode(source, parse, opts = {}) {
     const root = AST.parse(source, parse);
     const getLinesContent = sourceGetter(source);
     const nodes = [];
