@@ -27,9 +27,16 @@ function inspect() {
     };
 }
 
-async function getNodes(source, parse = {}) {
-    parse.loc = parse.loc || true;
-    return traversSourceCode(source, parse);
+/**
+ * 
+ * @param {string} source - The source code to extract node from
+ * @param {Object} parse - The AST parsing options
+ * @param {Object} opts - Additional traversal options
+ */
+async function getNodes(source, parse = {}, opts = {}) {
+    parse.loc = parse.loc || true;              // Nodes location enables saving node's source along with node information
+    opts.keepAttrs = opts.keepAttrs || false;   // Do not delete nodes' additional attributes
+    return traversSourceCode(source, parse, opts);
 }
 
 
