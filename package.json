@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "abstract-syntax-tree": "^2.5.0",
-    "uglify-js": "^3.8.0"
+    "terser": "^4.6.10"
   },
   "license": "MIT"
 }
