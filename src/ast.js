@@ -90,7 +90,7 @@ function getNodeSymbol(node, customMap = {}) {
     if (Object.prototype.hasOwnProperty.call(symbolMap, type)) {
         return customMap[type] || symbolMap[type];
     }
-    throw new Error(type);
+    return '_';     // Hardcoded symbol for yet unknown node typess
 }
 
 function getChildrenArray(node) {
