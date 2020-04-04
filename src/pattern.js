@@ -1,10 +1,10 @@
-const UglifyJS = require('uglify-js');
+const Terser = require('terser');
 const {traversSourceCode, symbolMap, getNodeSymbol} = require('./ast');
 
 /**
  * @param source {string}
  * @param input {object}
- *      minify {boolean/object},  https://www.npmjs.com/package/uglify-js#minify-options-structure
+ *      minify {boolean/object},  https://github.com/terser/terser#minify-options
  * @param parse {object} https://github.com/meriyah/meriyah#api
  * @param output
  * @return {Promise<*|void|string>}
@@ -18,7 +18,7 @@ async function createPattern(source, {input, parse, output}) {
 function getSource(source, opts) {
     if (opts.minify) {
         const minifyOpts = (typeof opts.minify === 'object') ? opts.minify : undefined;
-        const result = UglifyJS.minify(source, minifyOpts);
+        const result = Terser.minify(source, minifyOpts);
         if (result.error) {
             throw result.error;
         }
