@@ -1,6 +1,12 @@
 const AST = require('abstract-syntax-tree');
 const { symbolMap } = require('./constants');
 
+let nodeId = 0;
+
+function generateId() {
+    return nodeId++;
+}
+
 /**
  * 
  * @param {string} source - The source code to traverse
@@ -19,6 +25,9 @@ function traversSourceCode(source, parse, opts = {}) {
             if (!node) {
                 return resolve(nodes);
             }
+            if (!node.nodeId) {
+                node.nodeId = generateId();
+            }
             if (node.src === undefined) {
                 node.src = node.loc ? getLinesContent(node.loc) : '';
             }
@@ -35,6 +44,7 @@ function traversSourceCode(source, parse, opts = {}) {
             if (nodeChildren) {
                 for (let i = 0; i < nodeChildren.length; i++) {
                     const nodeChild = nodeChildren[i];
+                    nodeChild.parentId = node.nodeId;
                     nodeChild.src = nodeChild.loc ? getLinesContent(nodeChild.loc) : '';
                     children.push(nodeChild);
                 }
