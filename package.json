@@ -1,6 +1,6 @@
 {
   "name": "script-pattern-factory",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Creates patterns from Javascript code",
   "repository": "https://github.com/bgauryy/ScriptPatternFactory",
   "author": {
