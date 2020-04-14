@@ -19,9 +19,7 @@ function traversSourceCode(source, parse, opts = {}) {
             if (!node) {
                 return resolve(nodes);
             }
-            if (node.src === undefined) {
-                node.src = node.loc ? getLinesContent(node.loc) : '';
-            }
+
             const { nodeChildren, attrs } = getChildrenArray(node);
             const children = [];
             if (node.type !== 'Program') {
@@ -35,10 +33,21 @@ function traversSourceCode(source, parse, opts = {}) {
             if (nodeChildren) {
                 for (let i = 0; i < nodeChildren.length; i++) {
                     const nodeChild = nodeChildren[i];
-                    nodeChild.src = nodeChild.loc ? getLinesContent(nodeChild.loc) : '';
+                    // Workaround for location bug
+                    if (nodeChild.loc &&    // Skip nodes without locations
+                        (nodeChild.loc.start.line < node.loc.start.line
+                            || (nodeChild.loc.start.line === node.loc.start.line
+                                && nodeChild.loc.start.column < node.loc.start.column))) {
+                        node.loc.start = nodeChild.loc.start;
+                    }
                     children.push(nodeChild);
                 }
             }
+
+            if (node.src === undefined) {
+                node.src = node.loc ? getLinesContent(node.loc) : '';
+            }
+
             stack = children.concat(stack);
             //Avoid max stack exceptions
             Promise.resolve()
