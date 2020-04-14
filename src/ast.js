@@ -1,6 +1,7 @@
 const AST = require('abstract-syntax-tree');
 const { symbolMap } = require('./constants');
 
+
 /**
  * 
  * @param {string} source - The source code to traverse
@@ -12,12 +13,24 @@ function traversSourceCode(source, parse, opts = {}) {
     const getLinesContent = sourceGetter(source);
     const nodes = [];
     let stack = [root];
+    let nodeId = 0;
+
+    function generateId() {
+        return nodeId++;
+    }
 
     return new Promise(resolve => {
         (async function getDFS() {
             const node = stack.shift();
             if (!node) {
                 return resolve(nodes);
+            }
+
+            if (!node.nodeId) {
+                node.nodeId = generateId();
+            }
+            if (node.src === undefined) {
+                node.src = node.loc ? getLinesContent(node.loc) : '';
             }
 
             const { nodeChildren, attrs } = getChildrenArray(node);
@@ -32,7 +45,9 @@ function traversSourceCode(source, parse, opts = {}) {
             }
             if (nodeChildren) {
                 for (let i = 0; i < nodeChildren.length; i++) {
-                    const nodeChild = nodeChildren[i];
+
+                    nodeChild.parentId = node.nodeId;
+
                     // Workaround for location bug
                     if (nodeChild.loc &&    // Skip nodes without locations
                         (nodeChild.loc.start.line < node.loc.start.line
