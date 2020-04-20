@@ -2,8 +2,8 @@ const AST = require('abstract-syntax-tree');
 const { symbolMap } = require('./constants');
 const { generate } = require('escodegen');
 
-/**s
- * s
+/**
+ * 
  * @param {string} source - The source code to traverse
  * @param {Object} parse - The parsing options for the AST parser
  * @param {Object} opts - Additional traversal options
