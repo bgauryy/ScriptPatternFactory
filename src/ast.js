@@ -13,12 +13,20 @@ function traversSourceCode(source, parse, opts = {}) {
     const getLinesContent = sourceGetter(source);
     const nodes = [];
     let stack = [root];
+    let nodeId = 0;
+
+    function generateId() {
+        return nodeId++;
+    }
 
     return new Promise(resolve => {
         (async function getDFS() {
             const node = stack.shift();
             if (!node) {
                 return resolve(nodes);
+            }
+            if (!node.nodeId) {
+                node.nodeId = generateId();
             }
 
             const { nodeChildren, attrs } = getChildrenArray(node);
