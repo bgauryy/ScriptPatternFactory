@@ -2,6 +2,7 @@ const AST = require('abstract-syntax-tree');
 const { symbolMap } = require('./constants');
 const { generate } = require('escodegen');
 
+
 /**
  * 
  * @param {string} source - The source code to traverse
@@ -25,8 +26,13 @@ function traversSourceCode(source, parse, opts = {}) {
             if (!node) {
                 return resolve(nodes);
             }
+
             if (!node.nodeId) {
                 node.nodeId = generateId();
+            }
+            if (node.src === undefined) {
+                node.src = node.loc ? getLinesContent(node.loc) : '';
+
             }
 
             const { nodeChildren, attrs } = getChildrenArray(node);
@@ -43,6 +49,7 @@ function traversSourceCode(source, parse, opts = {}) {
                 for (let i = 0; i < nodeChildren.length; i++) {
                     const nodeChild = nodeChildren[i];
                     nodeChild.parentId = node.nodeId;
+
                     // Workaround for location bug
                     if (nodeChild.loc &&    // Skip nodes without locations
                         (nodeChild.loc.start.line < node.loc.start.line

@@ -1,7 +1,8 @@
 
-# script pattern factory
+# Script Pattern Factory
 
-Simple tool for creating AST patterns from JavaScript code
+A simple tool for creating AST signatures from raw strings.
+The tool is developed to find patterns in code, but it can be used for any purpose 
 
 ## API
 
