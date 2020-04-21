@@ -42,6 +42,7 @@ function traversSourceCode(source, parse, opts = {}) {
             if (nodeChildren) {
                 for (let i = 0; i < nodeChildren.length; i++) {
                     const nodeChild = nodeChildren[i];
+                    if (!nodeChild) continue;
                     nodeChild.parentId = node.nodeId;
                     // Workaround for location bug
                     if (nodeChild.loc &&    // Skip nodes without locations
