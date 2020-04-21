@@ -1,5 +1,6 @@
 const AST = require('abstract-syntax-tree');
 const { symbolMap } = require('./constants');
+const { generate } = require('escodegen');
 
 
 /**
@@ -31,6 +32,7 @@ function traversSourceCode(source, parse, opts = {}) {
             }
             if (node.src === undefined) {
                 node.src = node.loc ? getLinesContent(node.loc) : '';
+
             }
 
             const { nodeChildren, attrs } = getChildrenArray(node);
@@ -45,7 +47,8 @@ function traversSourceCode(source, parse, opts = {}) {
             }
             if (nodeChildren) {
                 for (let i = 0; i < nodeChildren.length; i++) {
-
+                    const nodeChild = nodeChildren[i];
+                    if (!nodeChild) continue;
                     nodeChild.parentId = node.nodeId;
 
                     // Workaround for location bug
@@ -60,7 +63,11 @@ function traversSourceCode(source, parse, opts = {}) {
             }
 
             if (node.src === undefined) {
-                node.src = node.loc ? getLinesContent(node.loc) : '';
+                try {
+                    node.src = generate(node);
+                } catch (e) {
+                    node.src = node.loc ? getLinesContent(node.loc) : '';
+                }
             }
 
             stack = children.concat(stack);
